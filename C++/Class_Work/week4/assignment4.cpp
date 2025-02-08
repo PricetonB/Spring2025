@@ -1,14 +1,6 @@
 //Priceton Braswell
+//Assignment 4B
 
-
-
-
-
-
-//---------------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------------
-
-// person class
 
 
 #include <cmath>
@@ -17,6 +9,10 @@
 #include <vector>
 #include <iostream>
 
+
+
+//---------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------
 
 
 class Person {
@@ -114,15 +110,12 @@ public:
 
 };
 
-  //---------------------------------------------------------------------------------------------------------
-  //---------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------
 
 
 
-//group class
-//public methods: add person, print person info, print group info, -
 
-//private methods: calculate_male_bmi_avg, calculate_female_bmi_avg, calculate_group_bmi_avg, 
 
 
 
@@ -142,13 +135,47 @@ private:
 
   
 
-  void m_print_weight_class_percentages() {
-    std::cout << "overweight members: " << (m_group_count / m_weight_class_counts[0]) << "% \n";
-    std::cout << "probably not overweight members: " << (m_group_count / m_weight_class_counts[1]) << "% \n";
-    std::cout << "normal members: " << (m_group_count / m_weight_class_counts[2]) << "% \n";
-    std::cout << "underweight members: " << (m_group_count / m_weight_class_counts[3]) << "% \n";
+
+void m_print_weight_class_percentages() {
+    if (m_group_count != 0) {
+        if (m_weight_class_counts[0] != 0) {
+            std::cout << "overweight members: " 
+                      << (static_cast<float>(m_weight_class_counts[0]) / m_group_count) * 100 
+                      << "% \n";
+        } else {
+            std::cout << "overweight members: 0% \n";
+        }
+
+        if (m_weight_class_counts[1] != 0) {
+            std::cout << "probably not overweight members: " 
+                      << (static_cast<float>(m_weight_class_counts[1]) / m_group_count) * 100 
+                      << "% \n";
+        } else {
+            std::cout << "probably not overweight members: 0% \n";
+        }
+
+        if (m_weight_class_counts[2] != 0) {
+            std::cout << "normal members: " 
+                      << (static_cast<float>(m_weight_class_counts[2]) / m_group_count) * 100 
+                      << "% \n";
+        } else {
+            std::cout << "normal members: 0% \n";
+        }
+
+        if (m_weight_class_counts[3] != 0) {
+            std::cout << "underweight members: " 
+                      << (static_cast<float>(m_weight_class_counts[3]) / m_group_count) * 100 
+                      << "% \n";
+        } else {
+            std::cout << "underweight members: 0% \n";
+        }
+    } else {
+        std::cout << "Group count is zero. Cannot calculate percentages.\n";
+    }
+
     return;
-  }
+}
+
 
   void m_print_person_info(Person person) {
     
@@ -158,12 +185,13 @@ private:
     std::cout << "Body Fat Percentage: " << person.get_body_fat_percent() << "\n";
     std::cout << "Sex: " << person.get_sex() << "\n";
     std::cout << "BMI: " << person.get_bmi() << "\n";
-    std::cout << "Weight Class: " << person.get_weight_class_id() << "\n";
+    std::cout << "Weight Class: " << m_weight_class_names[person.get_weight_class_id()] << "\n";
   }
 
 //-------------------------------------------------------------------------------------
   // I HAD CHAT GPT DO THE THREE CALCULATE FUNCTIONS BELOW. 
   // NOT BECAUSE I COULDNT DO IT. BUT BECAUSE ITS 2AM AND IM TIRED.
+  // I REMEMBER IN THE FIRST VIDEO YOU SAID TO LET YOU KNOW WHEN WE DO THAT. 
 
   void m_calculate_group_bmi_avg() {
     if (m_group_count == 0) {
@@ -230,16 +258,16 @@ public:
       return;
     }
 
-    std::cout << " Number of people in group:";
-    std::cout << " Group BMI average: ";
-    std::cout << " Male BMI average: ";
-    std::cout << "Female BMI average: ";
+    std::cout << "Number of people in group: " << m_group_count << "\n";
+    std::cout << "Group BMI average: " << m_group_bmi_avg << "\n";
+    std::cout << "Male BMI average: " << m_male_bmi_avg << "\n" ;
+    std::cout << "Female BMI average: " << m_female_bmi_avg << "\n";
     m_print_weight_class_percentages();
   }
 
   void print_person_info(int person_id) {
     if (person_id > m_group_count - 1) {
-      std::cout << "unable to find person ID.";
+      std::cout << "UNABLE TO FIND PERSON ID " << person_id;
     }
     m_print_person_info(m_people[person_id]);
   }
@@ -274,6 +302,12 @@ public:
     std::cout << "male or female? "  << "\n";
     std::cin >> sex; 
 
+    while (sex != "male" && sex != "female") {
+      std::cout << "Try again. Type male or female all lower case and press enter. \n";
+      std::cin >> sex;
+
+    }
+
     person_id = m_group_count;
  
     Person person_to_add = Person(name, inches, feet, sex, pounds, body_fat_percent, person_id);
@@ -285,7 +319,7 @@ public:
     m_group_count += 1;
     if (sex == "male") {
       m_male_count += 1;
-      m_calculate_female_bmi_avg();
+      m_calculate_male_bmi_avg();
       
       
     }
@@ -296,14 +330,13 @@ public:
     m_calculate_group_bmi_avg();
 
 
-    std::cout << "person created. person ID is " << person_id << "\n";
+    std::cout << "PERSON CREATED! PERSON ID IS " << person_id << "\n";
   }
 
 };
 
 
 
-//  Person(std::string name, int height_inches, int height_feet, std::string sex, float pounds, int fat_percent, int id)
 
 
 
@@ -349,6 +382,7 @@ int main (int argc, char *argv[]) {
         break;
       case 4:
         running = false;
+        break;
       default:
         std::cout << choice << " is not a valid choice \n ";
         break;
@@ -364,5 +398,4 @@ int main (int argc, char *argv[]) {
 }
 
 
-//Person(std::string name, int height_inches, int height_feet, std::string sex, float pounds, int fat_percent, int id)
 
