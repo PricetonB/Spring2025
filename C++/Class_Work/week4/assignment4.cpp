@@ -143,10 +143,15 @@ private:
   
 
   void m_print_weight_class_percentages() {
+    std::cout << "overweight members: " << (m_group_count / m_weight_class_counts[0]) << "% \n";
+    std::cout << "probably not overweight members: " << (m_group_count / m_weight_class_counts[1]) << "% \n";
+    std::cout << "normal members: " << (m_group_count / m_weight_class_counts[2]) << "% \n";
+    std::cout << "underweight members: " << (m_group_count / m_weight_class_counts[3]) << "% \n";
     return;
   }
 
   void m_print_person_info(Person person) {
+    
     std::cout << "Name: " << person.get_first_name() << "\n";
     std::cout << "Height: " << person.get_height_feet() << "," << person.get_height_inches() << "\n";
     std::cout << "Weight: " << person.get_weight() << "\n";
@@ -156,8 +161,68 @@ private:
     std::cout << "Weight Class: " << person.get_weight_class_id() << "\n";
   }
 
+//-------------------------------------------------------------------------------------
+  // I HAD CHAT GPT DO THE THREE CALCULATE FUNCTIONS BELOW. 
+  // NOT BECAUSE I COULDNT DO IT. BUT BECAUSE ITS 2AM AND IM TIRED.
+
+  void m_calculate_group_bmi_avg() {
+    if (m_group_count == 0) {
+      m_group_bmi_avg = 0;  // No people, so average BMI is 0
+      return;
+    }
+
+    float total_bmi = 0;
+    for (Person person : m_people) {
+      total_bmi += person.get_bmi();
+    }
+
+    m_group_bmi_avg = total_bmi / m_group_count;
+  }
+
+  // Function to calculate the average BMI for male members of the group
+  void m_calculate_male_bmi_avg() {
+    if (m_male_count == 0) {
+      m_male_bmi_avg = 0;  // No males in the group
+      return;
+    }
+
+    float total_bmi_males = 0;
+    for (Person person : m_people) {
+      if (person.get_sex() == "male") {
+        total_bmi_males += person.get_bmi();
+      }
+    }
+
+    m_male_bmi_avg = total_bmi_males / m_male_count;
+  }
+
+  // Function to calculate the average BMI for female members of the group
+  void m_calculate_female_bmi_avg() {
+    if (m_female_count == 0) {
+      m_female_bmi_avg = 0;  // No females in the group
+      return;
+    }
+
+    float total_bmi_females = 0;
+    for (Person person : m_people) {
+      if (person.get_sex() == "female") {
+        total_bmi_females += person.get_bmi();
+      }
+    }
+
+    m_female_bmi_avg = total_bmi_females / m_female_count;
+  }
+
+
 public:
 
+  Group()
+   :m_group_count(0),
+    m_male_count(0),
+    m_female_count(0),
+    m_male_bmi_avg(0),
+    m_female_bmi_avg(0),
+    m_group_bmi_avg(0) {}
 
   void print_group_info() {
     if (m_group_count == 0) {
@@ -173,12 +238,15 @@ public:
   }
 
   void print_person_info(int person_id) {
+    if (person_id > m_group_count - 1) {
+      std::cout << "unable to find person ID.";
+    }
     m_print_person_info(m_people[person_id]);
   }
 
 
 
-  void add_person () {
+  void add_person() {
     std::string name;
     int feet;
     int inches;
@@ -206,21 +274,29 @@ public:
     std::cout << "male or female? "  << "\n";
     std::cin >> sex; 
 
-    m_group_count += 1;
     person_id = m_group_count;
-
-
-    if (sex == "male") {
-      m_male_count += 1;
-    }
-    if (sex == "female") {
-      m_female_count +=1;
-    }
-
-
+ 
     Person person_to_add = Person(name, inches, feet, sex, pounds, body_fat_percent, person_id);
     m_people.push_back(person_to_add);
     m_weight_class_counts[person_to_add.get_weight_class_id()]++;
+
+
+
+    m_group_count += 1;
+    if (sex == "male") {
+      m_male_count += 1;
+      m_calculate_female_bmi_avg();
+      
+      
+    }
+    if (sex == "female") {
+      m_female_count +=1;
+      m_calculate_female_bmi_avg();
+    }
+    m_calculate_group_bmi_avg();
+
+
+    std::cout << "person created. person ID is " << person_id << "\n";
   }
 
 };
@@ -248,9 +324,41 @@ public:
 
 
 int main (int argc, char *argv[]) {
-  Person p1 = Person("mike", 10, 5, "male", 150.0, 15, 1);
+  Group group = Group();
 
-  print_person_info(p1);
+  int running = true;
+
+  while (running) {
+    int choice;
+    std::cout << "Please type a number from actions below and press enter \n ";
+    std::cout << "1 = Add Person \t 2 = Get Person Information: \t 3 = Get Group Information \t 4 = Quit \n";
+    std::cin >> choice;
+
+    switch (choice) {
+      case 1:
+        group.add_person();
+        break;
+      case 2:
+        int id_entered;
+        std::cout << "Please enter persons ID: \n";
+        std::cin >> id_entered;
+        group.print_person_info(id_entered);
+        break;
+      case 3:
+        group.print_group_info();
+        break;
+      case 4:
+        running = false;
+      default:
+        std::cout << choice << " is not a valid choice \n ";
+        break;
+    
+    }
+
+  
+  }
+
+
 
   return 0;
 }
