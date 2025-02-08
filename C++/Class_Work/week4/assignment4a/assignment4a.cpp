@@ -1,5 +1,5 @@
 //Priceton Braswell
-//Assignment 4B
+//Assignment 4A 
 
 
 
@@ -135,7 +135,7 @@ private:
 
   
 
-
+//I HAD CHATGPT ADD IF STATEMENTS IN FUNCTION BELOW AND STATIC CAST TO HANDLE FLOAT EXCEPTION ERROR FOR DIVIDING BY ZERO. 
 void m_print_weight_class_percentages() {
     if (m_group_count != 0) {
         if (m_weight_class_counts[0] != 0) {
@@ -252,6 +252,16 @@ public:
     m_female_bmi_avg(0),
     m_group_bmi_avg(0) {}
 
+
+  void print_group_bmi_for_4a() {
+    std::cout << "Average BMI for group: " << m_group_bmi_avg << "\n";
+  }
+
+
+  void print_weight_class_percentages_for_4a() {
+    m_print_weight_class_percentages();
+  }
+
   void print_group_info() {
     if (m_group_count == 0) {
       std::cout << "there are no people in the group \n";
@@ -338,61 +348,14 @@ public:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 int main (int argc, char *argv[]) {
   Group group = Group();
 
-  int running = true;
-
-  while (running) {
-    int choice;
-    std::cout << "Please type a number from actions below and press enter \n ";
-    std::cout << "1 = Add Person \t 2 = Get Person Information: \t 3 = Get Group Information \t 4 = Quit \n";
-    std::cin >> choice;
-
-    switch (choice) {
-      case 1:
-        group.add_person();
-        break;
-      case 2:
-        int id_entered;
-        std::cout << "Please enter persons ID: \n";
-        std::cin >> id_entered;
-        group.print_person_info(id_entered);
-        break;
-      case 3:
-        group.print_group_info();
-        break;
-      case 4:
-        running = false;
-        break;
-      default:
-        std::cout << choice << " is not a valid choice \n ";
-        break;
-    
-    }
-
-  
+  for (int i=0; i < 5; i++ ) {
+    group.add_person();
   }
-
-
+  group.print_group_bmi_for_4a();
+  group.print_weight_class_percentages_for_4a();
 
   return 0;
 }
