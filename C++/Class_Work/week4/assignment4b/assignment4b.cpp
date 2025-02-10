@@ -267,7 +267,8 @@ public:
 
   void print_person_info(int person_id) {
     if (person_id > m_group_count - 1) {
-      std::cout << "UNABLE TO FIND PERSON ID " << person_id;
+      std::cout << "UNABLE TO FIND PERSON ID " << person_id << "\n";
+      return;
     }
     m_print_person_info(m_people[person_id]);
   }
@@ -299,14 +300,15 @@ public:
     std::cout << "please enter your body fat percent "  << "\n";
     std::cin >> body_fat_percent; 
 
-    std::cout << "male or female? "  << "\n";
-    std::cin >> sex; 
+    std::cout << "Male or female? " << "\n";
+    std::cin.ignore();  
+    std::getline(std::cin, sex);  
 
     while (sex != "male" && sex != "female") {
-      std::cout << "Try again. Type male or female all lower case and press enter. \n";
-      std::cin >> sex;
-
+        std::cout << "Try again. Type male or female all lowercase and press enter. \n";
+        std::getline(std::cin, sex);  
     }
+
 
     person_id = m_group_count;
  
@@ -364,7 +366,7 @@ int main (int argc, char *argv[]) {
   while (running) {
     int choice;
     std::cout << "Please type a number from actions below and press enter \n ";
-    std::cout << "1 = Add Person \t 2 = Get Person Information: \t 3 = Get Group Information \t 4 = Quit \n";
+    std::cout << "1 = Add Person \t 2 = Get Person Information \t 3 = Get Group Information \t 4 = Quit \n";
     std::cin >> choice;
 
     switch (choice) {
