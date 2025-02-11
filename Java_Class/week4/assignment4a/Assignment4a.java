@@ -178,6 +178,16 @@ class Group {
 
         femaleBmiAvg = totalBmiFemales / femaleCount;
     }
+  
+    public void printGroupBMIfor4a() {
+      System.out.println("Average BMI for group: " + groupBmiAvg);
+    }
+  
+  
+    public void printWeightClassPercentageFor4a() {
+      printWeightClassPercentages();
+    }
+
 
     public void printGroupInfo() {
         if (groupCount == 0) {
@@ -247,36 +257,16 @@ class Group {
     }
 }
 
-public class Main {
+public class Assignment4a {
     public static void main(String[] args) {
         Group group = new Group();
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
-
-        while (running) {
-            System.out.println("Please type a number from actions below and press enter:");
-            System.out.println("1 = Add Person \t 2 = Get Person Information \t 3 = Get Group Information \t 4 = Quit");
-            int choice = scanner.nextInt();
-
-            switch (choice) {
-                case 1:
-                    group.addPerson();
-                    break;
-                case 2:
-                    System.out.println("Please enter person's ID:");
-                    int idEntered = scanner.nextInt();
-                    group.printPersonInfo(idEntered);
-                    break;
-                case 3:
-                    group.printGroupInfo();
-                    break;
-                case 4:
-                    running = false;
-                    break;
-                default:
-                    System.out.println(choice + " is not a valid choice.");
-                    break;
-            }
+        for (int i=0; i < 5; i++ ) {
+          group.addPerson();
         }
+        group.printGroupBMIfor4a();
+        group.printWeightClassPercentageFor4a();
+      
     }
 }
