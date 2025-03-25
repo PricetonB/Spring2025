@@ -64,10 +64,14 @@ public:
   void append_person_to_file(std::string file_name) {
     
     std::ofstream outfile(file_name, std::ios::app);
-    outfile << this->name << " "  << this->feet << ", " 
-  << this->inches << " " << "weight: " 
-  << this->bodyfat << "sex: " << this->sex 
-  << "bmi: " << this->bmi << "weightclass: " << this->weightclass << "\n";
+    outfile 
+  << this->name << " "  
+  << this->feet << "," 
+  << this->inches << " weight:" 
+  << this->bodyfat << " sex:" 
+  << this->sex << " bmi:"
+  << this->bmi << " weightclass:" 
+  << this->weightclass << "\n";
     outfile.close();
     return;
   }
