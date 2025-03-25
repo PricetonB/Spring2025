@@ -14,7 +14,162 @@
 //
 
 
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <fstream>
+#include <vector>
+#include <pthread.h>     // POSIX threads
+#include <chrono>        // for timing
 
+class Person {
+public:
+    std::string name;
+    int feet;
+    int inches;
+    double weight;
+    int bodyfat;
+    char sex;
+    double bmi;
+    char weightclass;
+
+    Person(std::string name, int feet, int inches, double weight, int bodyfat, char sex)
+        : name(name), feet(feet), inches(inches), weight(weight), bodyfat(bodyfat), sex(sex) {
+        calcBMI(feet, inches, weight);
+        calcWeightClass(bmi, bodyfat, sex);
+        std::cout << "Object created for " << name << "\n";
+    }
+
+    void calcBMI(int feet, int inches, double weight) {
+        bmi = weight / ((feet * 12 + inches) * (feet * 12 + inches)) * 703;
+    }
+
+    void calcWeightClass(double bmi, int bodyfat, char sex) {
+        if (bmi > 25) {
+            if (sex == 'm' && bodyfat > 24) {
+                weightclass = 'o'; return;
+            }
+            if (sex == 'f' && bodyfat > 31) {
+                weightclass = 'o'; return;
+            }
+            weightclass = 'p'; return;
+        }
+        if (bmi > 18.5) {
+            weightclass = 'n'; return;
+        }
+        weightclass = 'u';
+    }
+
+    void append_person_to_file(std::string file_name) {
+        std::ofstream outfile(file_name, std::ios::app);
+        outfile << this->name << " "
+                << this->feet << ","
+                << this->inches << " weight:"
+                << this->bodyfat << " sex:"
+                << this->sex << " bmi:"
+                << this->bmi << " weightclass:"
+                << this->weightclass << "\n";
+        outfile.close();
+    }
+};
+
+// Structure to pass data to threads
+struct ThreadData {
+    const std::vector<std::string>* lines;
+    size_t start;
+    size_t end;
+    std::vector<Person>* people;
+    pthread_mutex_t* mutex;
+};
+
+// Thread function
+void* processLines(void* arg) {
+    ThreadData* data = static_cast<ThreadData*>(arg);
+    std::vector<Person> local_people;
+
+    for (size_t i = data->start; i < data->end && i < data->lines->size(); i++) {
+        std::stringstream ss((*data->lines)[i]);
+        std::string name, feet, inches, weight, bodyfat, sex;
+        getline(ss, name, ',');
+        getline(ss, feet, ',');
+        getline(ss, inches, ',');
+        getline(ss, weight, ',');
+        getline(ss, bodyfat, ',');
+        getline(ss, sex, ',');
+        Person person(name, std::stoi(feet), std::stoi(inches),
+        std::stoi(weight), std::stoi(bodyfat), sex[0]);
+        local_people.push_back(person);
+    }
+
+    // Lock and merge results
+    pthread_mutex_lock(data->mutex);
+    data->people->insert(data->people->end(), local_people.begin(), local_people.end());
+    pthread_mutex_unlock(data->mutex);
+
+    pthread_exit(NULL);
+}
+
+int main() {
+    // Start timer
+    auto start = std::chrono::high_resolution_clock::now();
+
+    // Get thread count from user
+    int thread_count;
+    std::cout << "Enter number of threads to use: ";
+    std::cin >> thread_count;
+
+    // Read CSV file
+    std::ifstream f("datafile.csv");
+    std::vector<std::string> lines;
+    std::string line;
+    while (getline(f, line)) {
+        lines.push_back(line);
+    }
+    f.close();
+
+    // Prepare threading
+    std::vector<Person> people;
+    std::vector<pthread_t> threads(thread_count);
+    std::vector<ThreadData> thread_data(thread_count);
+    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
+    size_t lines_per_thread = lines.size() / thread_count;
+
+    // Create threads
+    for (int i = 0; i < thread_count; i++) {
+        thread_data[i].lines = &lines;
+        thread_data[i].start = i * lines_per_thread;
+        thread_data[i].end = (i == thread_count - 1) ? lines.size() : (i + 1) * lines_per_thread;
+        thread_data[i].people = &people;
+        thread_data[i].mutex = &mutex;
+
+        int rc = pthread_create(&threads[i], NULL, processLines, &thread_data[i]);
+        if (rc) {
+            std::cerr << "Error creating thread: " << rc << std::endl;
+            exit(-1);
+        }
+    }
+
+    // Wait for all threads to complete
+    for (int i = 0; i < thread_count; i++) {
+        pthread_join(threads[i], NULL);
+    }
+
+    // Clean up mutex
+    pthread_mutex_destroy(&mutex);
+
+    // Write results to file
+    for (const Person& person : people) {
+        person.append_person_to_file("output.txt");
+    }
+
+    // Calculate and display execution time
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout << "Execution time: " << duration.count() << " ms" << std::endl;
+
+    return 0;
+}
 
 
 
