@@ -9,6 +9,23 @@
 //setting it up this way doesnt require locks because the threads never mess with each others data.
 //im going to start a timer at beginning of main and kill it at end printing the time it took to run code.
 //feel free to play around with different thread numbers and file sizes to see speed difference. 
+// below the code is a commented out code segment that is my finished 
+// assignment before multi threading was implemented since i intend to use ai to help with multithreading.
+//
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 
 
 #include <iostream>
 #include <sstream>
@@ -114,6 +131,7 @@ int main() {
 
   }
 
+  //print_weightclass_distribution();
   
   return 0;
 
@@ -123,27 +141,7 @@ int main() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+*/
 
 
 
