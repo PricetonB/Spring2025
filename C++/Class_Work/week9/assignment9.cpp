@@ -9,9 +9,10 @@
 //setting it up this way doesnt require locks because the threads never mess with each others data.
 //im going to start a timer at beginning of main and kill it at end printing the time it took to run code.
 //feel free to play around with different thread numbers and file sizes to see speed difference. 
-// below the code is a commented out code segment that is my finished 
-// assignment before multi threading was implemented since i intend to use ai to help with multithreading.
-//
+//below the code is a commented out code segment that is my finished 
+//assignment before multi threading was implemented since i intend to use ai to help with multithreading.
+//with one thread i was able to get 1500ms with one thread reading 6,000 lines. I got down to 900ms with 3 threads
+//i think more noticeable differences will be seen with much larger data sets. 
 
 
 #include <iostream>
@@ -37,7 +38,6 @@ public:
         : name(name), feet(feet), inches(inches), weight(weight), bodyfat(bodyfat), sex(sex) {
         calcBMI(feet, inches, weight);
         calcWeightClass(bmi, bodyfat, sex);
-        std::cout << "Object created for " << name << "\n";
     }
 
     void calcBMI(int feet, int inches, double weight) {
@@ -84,6 +84,7 @@ struct ThreadData {
 
 // Thread function
 void* processLines(void* arg) {
+    //set the data structure we passed in to data
     ThreadData* data = static_cast<ThreadData*>(arg);
     std::vector<Person> local_people;
 
@@ -101,7 +102,10 @@ void* processLines(void* arg) {
         local_people.push_back(person);
     }
 
-    // Lock and merge results
+    // lock and merge results. a lock is needed because data.people is a shared resource amongst all threads
+    // so the lock prevents a race condition. lines, people, and mutex is shared amongst all threads and would need a lock
+    // program may be slowed down slightly because of this lock but since its just used to add to data.people each thread
+    // can still create all of the people objects independently in for loop above without waiting on lock. this is good. 
     pthread_mutex_lock(data->mutex);
     data->people->insert(data->people->end(), local_people.begin(), local_people.end());
     pthread_mutex_unlock(data->mutex);
@@ -159,7 +163,7 @@ int main() {
     pthread_mutex_destroy(&mutex);
 
     // Write results to file
-    for (const Person& person : people) {
+    for (Person& person : people) {  // Changed from const Person& to Person&
         person.append_person_to_file("output.txt");
     }
 
